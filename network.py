@@ -4,7 +4,8 @@ class QValue(nn.Module):
     def __init__(self, configs):
         super(QValue, self).__init__()
         self.q_value = self.mlp(config=configs)
-    
+        print(self.q_value)
+
     def mlp(self, config, last_active=True) -> nn.Sequential:
         layers = []
         mlp_dims = [config.Env.observation_space] + config.Network.mlp_dims
