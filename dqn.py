@@ -89,14 +89,3 @@ class DQN():
 
                 if self.config.Env.testing_render:
                     env.render()
-
-    def save(self):
-        path = os.path.join(os.getcwd(),f"{self.config.Env.save_file_name}.pt")
-        print(f"save path {path}")
-        torch.save(self.target_net.state_dict(), path)
-    
-    def load(self):
-        path = os.path.join(os.getcwd(),f"{self.config.Env.save_file_name}.pt")
-        print(f"load path {path}")
-        self.target_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
-        self.predict_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
