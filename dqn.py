@@ -56,8 +56,8 @@ class DQN():
                 state = next_state
                 
                 num_step +=1 
-                if done:
-                    is_done = True
+        
+
                 target_net_state_dict = self.target_net.state_dict()
                 policy_net_state_dict = self.predict_net.state_dict()
                 for key in policy_net_state_dict:
@@ -65,7 +65,10 @@ class DQN():
                 self.target_net.load_state_dict(target_net_state_dict)
                 if self.config.Env.training_render:
                     env.render()
-
+                if done:
+                    is_done = True
+                    break
+                
     def testing(self):
         env = self.config.Env.make_env
         self.load()
@@ -85,6 +88,7 @@ class DQN():
 
                 if done:
                     is_done = True
+                    break
 
                 if self.config.Env.testing_render:
                     env.render()
