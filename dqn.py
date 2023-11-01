@@ -52,14 +52,11 @@ class DQN():
                 next_state, reward, done ,_= env.step(action.item()) 
                 reward = torch.tensor([reward], device=self.device)
                 next_state = torch.tensor(next_state, dtype=torch.float32, device=self.device).unsqueeze(0)
-                
                 self.buffer.update(state, action, next_state, reward, done)
                 state = next_state
                 
                 num_step +=1 
         
-
-
                 if self.config.Env.training_render:
                     env.render()
                 if done:
@@ -68,7 +65,7 @@ class DQN():
                 
     def testing(self):
         env = self.config.Env.make_env
-        self.load()
+        self.buffer.load()
         for i_episode in range(self.config.Env.te_num_episodes):
             state = env.reset()
             state = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
