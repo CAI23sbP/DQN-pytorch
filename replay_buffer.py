@@ -51,7 +51,7 @@ class ReplayBuffer():
             next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,4)
             self.next_value[~self.done_batch.view(-1)] = self.target_net(next_states).max(1)[0]
         
-        expected_func = predict_q_value * self.config.Network.GAMMA + self.reward_batch.view(-1)
+        expected_func = predict_q_value * self.config.Network.GAMMA + self.reward_batch
         loss = self.criterion(predict_q_value, expected_func.unsqueeze(1))
         self.optimizer.zero_grad()
         loss.backward()
