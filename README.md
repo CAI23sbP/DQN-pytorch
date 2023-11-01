@@ -6,8 +6,11 @@ Deep Q-value Network by pytorch
 
 `pip install -r requirements.txt`
 
-## Training and Testing at once ##
-`python3 main.py`
+## Training  ##
+`python3 train.py`
+
+## Testing  ##
+`python3 test.py`
 
 ## See detail config ## 
 open `configs.py`
