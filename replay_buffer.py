@@ -52,7 +52,7 @@ class ReplayBuffer():
             self.next_value[~self.done_batch.view(-1)] = self.target_net(next_states).max(1)[0]
         
         expected_func = predict_q_value * self.config.Network.GAMMA + self.reward_batch
-        loss = self.criterion(predict_q_value, expected_func.unsqueeze(1))
+        loss = self.criterion(predict_q_value, expected_func)
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
