@@ -1,4 +1,4 @@
-import random, math, torch, os 
+import random, math, torch
 from replay_buffer import ReplayBuffer
 from network import QValue 
 
