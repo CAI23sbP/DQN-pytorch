@@ -62,3 +62,14 @@ class ReplayBuffer():
             target_net_state_dict[key] = policy_net_state_dict[key] * self.config.Network.TAU + target_net_state_dict[key]*(1- self.config.Network.TAU)
         self.target_net.load_state_dict(target_net_state_dict)
 
+    def save(self):
+        path = os.path.join(os.getcwd(),f"{self.config.Env.save_file_name}.pt")
+        print(f"save path {path}")
+        torch.save(self.target_net.state_dict(), path)
+    
+    def load(self):
+        path = os.path.join(os.getcwd(),f"{self.config.Env.save_file_name}.pt")
+        print(f"load path {path}")
+        self.target_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
+        self.predict_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
+
