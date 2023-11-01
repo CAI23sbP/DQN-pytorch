@@ -56,5 +56,9 @@ class ReplayBuffer():
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        return  self.target_net, self.predict_net 
+        target_net_state_dict = self.target_net.state_dict()
+        policy_net_state_dict = self.predict_net.state_dict()
+        for key in policy_net_state_dict:
+            target_net_state_dict[key] = policy_net_state_dict[key] * self.config.Network.TAU + target_net_state_dict[key]*(1- self.config.Network.TAU)
+        self.target_net.load_state_dict(target_net_state_dict)
 
