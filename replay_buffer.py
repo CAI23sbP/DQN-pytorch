@@ -36,7 +36,7 @@ class ReplayBuffer():
 
     def on_step(self):
         self.iter +=1
-        self.iter = int(self.iter/ 10)
+
 
     def update(self,*args):
         self.add(*args)
