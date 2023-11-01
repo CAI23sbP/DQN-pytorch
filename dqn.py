@@ -53,17 +53,13 @@ class DQN():
                 reward = torch.tensor([reward], device=self.device)
                 next_state = torch.tensor(next_state, dtype=torch.float32, device=self.device).unsqueeze(0)
                 
-                self.target_net, self.predict_net = self.buffer.update(state, action, next_state, reward, done)
+                self.buffer.update(state, action, next_state, reward, done)
                 state = next_state
                 
                 num_step +=1 
         
 
-                target_net_state_dict = self.target_net.state_dict()
-                policy_net_state_dict = self.predict_net.state_dict()
-                for key in policy_net_state_dict:
-                    target_net_state_dict[key] = policy_net_state_dict[key] * self.config.Network.TAU + target_net_state_dict[key]*(1- self.config.Network.TAU)
-                self.target_net.load_state_dict(target_net_state_dict)
+
                 if self.config.Env.training_render:
                     env.render()
                 if done:
