@@ -52,7 +52,8 @@ class DQN():
                 next_state, reward, done ,_= env.step(action.item()) 
                 reward = torch.tensor([reward], device=self.device)
                 next_state = torch.tensor(next_state, dtype=torch.float32, device=self.device).unsqueeze(0)
-                self.buffer.update(state, action, next_state, reward, done)
+                
+                self.target_net, self.predict_net = self.buffer.update(state, action, next_state, reward, done)
                 state = next_state
                 
                 num_step +=1 
