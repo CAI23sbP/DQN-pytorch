@@ -28,18 +28,22 @@ class ReplayBuffer():
 
     def init_batch(self):
         self.state_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.observation_space)
-        self.action_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.action_space.n, dtype=torch.int64)
+        self.action_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,1, dtype=torch.int64)
         self.next_state_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.observation_space)
-        self.reward_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,1)
+        self.reward_batch = torch.zeros(self.config.Buffer.BATCH_SIZE)
         self.done_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,1,dtype = torch.bool)
         self.next_value = torch.zeros(self.config.Buffer.BATCH_SIZE, device=self.config.Env.device)
 
+    def on_step(self):
+        self.iter +=1
+        self.iter = int(self.iter/ 10)
+
     def update(self,*args):
         self.add(*args)
+        self.on_step()
         if len(self.memory) < self.config.Buffer.BATCH_SIZE:
             return
         dataset = self.sample()
-        self.iter +=1
         for i, data in enumerate([*dataset]):
             self.state_batch[i] = data[0]
             self.action_batch [i] = data[1] 
@@ -50,21 +54,21 @@ class ReplayBuffer():
         predict_q_value = self.predict_net(self.state_batch).gather(1, self.action_batch)
 
         with torch.no_grad():
-            next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,4)
+            next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,self.config.Env.observation_space)
             self.next_value[~self.done_batch.view(-1)] = self.target_net(next_states).max(1)[0]
+            
             rewards = self.reward_batch[~self.done_batch.view(-1)]
             G_return = 0
-            for reward in rewards[-2]:
-                G_return += reward.item()*self.config.Network.GAMMA 
+            for i in range(len(rewards)-1):
+                G_return += rewards[i]*self.config.Network.GAMMA 
             G_return+=rewards[-1].item()
-        expected_func = predict_q_value * self.config.Network.GAMMA + self.reward_batch
+        expected_func = self.next_value * self.config.Network.GAMMA + self.reward_batch
 
         loss = self.criterion(predict_q_value, expected_func)
-
         tag_scalar_loss= {"Q_value_loss": loss}
         tag_scalar_return= {"return": G_return}
-        self.writer.add_scalars("return",tag_scalar_return, self.iter)
-        self.writer.add_scalars("Q_value_loss",tag_scalar_loss, self.iter)
+        self.writer.add_scalars("DQN",tag_scalar_return, self.iter)
+        self.writer.add_scalars("DQN",tag_scalar_loss, self.iter)
         
         self.optimizer.zero_grad()
         loss.backward()
