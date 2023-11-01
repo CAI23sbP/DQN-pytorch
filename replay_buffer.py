@@ -66,8 +66,8 @@ class ReplayBuffer():
         loss = self.criterion(predict_q_value.view(-1), expected_func)
         tag_scalar_loss= {"Q_value_loss": loss}
         tag_scalar_return= {"return": G_return}
-        self.writer.add_scalars("DQN",tag_scalar_return, self.iter)
-        self.writer.add_scalars("DQN",tag_scalar_loss, self.iter)
+        self.writer.add_scalars("return",tag_scalar_return, self.iter)
+        self.writer.add_scalars("Q_value_loss",tag_scalar_loss, self.iter)
         
         self.optimizer.zero_grad()
         loss.backward()
