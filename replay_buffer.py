@@ -26,7 +26,7 @@ class ReplayBuffer():
 
     def init_batch(self):
         self.state_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.observation_space)
-        self.action_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.action_space.n)
+        self.action_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.action_space.n,dtype=torch.int64)
         self.next_state_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.observation_space)
         self.reward_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,1)
         self.done_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,1,dtype = torch.bool)
@@ -45,7 +45,7 @@ class ReplayBuffer():
             self.reward_batch [i] = data[3]
             self.done_batch [i] = data[4] 
 
-        predict_q_value = self.predict_net(self.state_batch)
+        predict_q_value = self.predict_net(self.state_batch).gather(1,self.action_batch)
 
         with torch.no_grad():
             next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,4)
