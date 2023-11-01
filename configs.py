@@ -14,14 +14,14 @@ class Config():
     Env.norm_reward = False
     Env.norm_obs = False
     Env.device = "cpu"
-    Env.training_render = False
+    Env.training_render = True
     Env.testing_render = True
-    Env.num_episodes = 1 ## for training
-    Env.max_step = 2 ## for training
+    Env.num_episodes = 600 ## for training
+    Env.max_step = 500 ## for training
     Env.save_file_name = "dqn_model"
 
-    Env.te_num_episodes = 5 ## for testing
-    Env.te_max_step = 100 ##for testing
+    Env.te_num_episodes = 10 ## for testing
+    Env.te_max_step = 500 ##for testing
 
     Env.make_env = gym.make(Env.name)
     if Env.norm_obs:
@@ -34,15 +34,15 @@ class Config():
 
 
     Buffer = BaseConfig()
-    Buffer.capacity = 100
-    Buffer.BATCH_SIZE = 2
+    Buffer.capacity = 10000
+    Buffer.BATCH_SIZE = 128
 
     Buffer.tuple = {"Transition":("state","action","next_state","reward","done")}
 
     Network = BaseConfig()
-    Network.mlp_dims = [64,32,Env.action_space.n]
+    Network.mlp_dims = [128,128,128,Env.action_space.n]
     Network.activation = nn.ReLU()
-    Network.optimizer = optim.Adam
+    Network.optimizer = optim.AdamW
     Network.loss_function = nn.MSELoss()
     Network.LR = 3e-1
     Network.GAMMA = 0.99
