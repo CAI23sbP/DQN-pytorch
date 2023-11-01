@@ -56,4 +56,5 @@ class ReplayBuffer():
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        
+        return  self.target_net, self.predict_net 
+
