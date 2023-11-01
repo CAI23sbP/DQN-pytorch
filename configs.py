@@ -2,6 +2,7 @@ import torch.nn as nn
 import gym 
 import torch.optim as optim
 from gym.wrappers.normalize import *
+import numpy as np
 
 class BaseConfig():
     def __init__(self):
@@ -17,7 +18,7 @@ class Config():
     Env.training_render = True
     Env.testing_render = True
     Env.num_episodes = 600 ## for training
-    Env.max_step = 500 ## for training
+    Env.max_step = np.inf ## for training
     Env.save_file_name = "dqn_model"
 
     Env.te_num_episodes = 10 ## for testing
@@ -44,7 +45,7 @@ class Config():
     Network.activation = nn.ReLU()
     Network.optimizer = optim.AdamW
     Network.loss_function = nn.MSELoss()
-    Network.LR = 3e-1
+    Network.LR = 1e-4
     Network.GAMMA = 0.99
     Network.EPS_START = 0.9
     Network.EPS_END = 5e-2
