@@ -12,16 +12,15 @@ class Config():
 
     Env = BaseConfig()
     Env.name = "CartPole-v1"
-    Env.norm_reward = False
+    Env.norm_reward = True
     Env.norm_obs = False
     Env.device = "cpu"
     Env.training_render = True
     Env.testing_render = True
-    Env.num_episodes = 600 ## for training
+    Env.num_episodes = 2000 ## for training
     Env.max_step = np.inf ## for training
     Env.save_file_name = "dqn_model"
-
-    Env.te_num_episodes = 10 ## for testing
+    Env.te_num_episodes = 100 ## for testing
     Env.te_max_step = 500 ##for testing
 
     Env.make_env = gym.make(Env.name)
@@ -41,13 +40,14 @@ class Config():
     Buffer.tuple = {"Transition":("state","action","next_state","reward","done")}
 
     Network = BaseConfig()
-    Network.mlp_dims = [128,128,128,Env.action_space.n]
+    Network.mlp_dims = [128,128,Env.action_space.n]
     Network.activation = nn.ReLU()
     Network.optimizer = optim.AdamW
-    Network.loss_function = nn.MSELoss()
+    Network.loss_function = nn.SmoothL1Loss()
     Network.LR = 1e-4
     Network.GAMMA = 0.99
     Network.EPS_START = 0.9
     Network.EPS_END = 5e-2
     Network.EPS_DECAY = 1e3
     Network.TAU = 5e-3
+    Network.epoch = 10
