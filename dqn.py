@@ -1,5 +1,4 @@
 import random, math, torch, os 
-from replay_buffer import ReplayBuffer
 from network import QValue 
 
 
@@ -23,7 +22,7 @@ class DQN():
         return optimizer, criterion
 
     def init_memory(self,config):
-        self.buffer = ReplayBuffer(config, self.predict_net, self.target_net, self.opt_lossf)
+        self.buffer = config.Buffer.types(config, self.predict_net, self.target_net, self.opt_lossf)
 
     def action(self, state, phase = "train"):
         if phase =="train":
