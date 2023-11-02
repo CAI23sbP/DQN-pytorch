@@ -25,21 +25,21 @@ class DQN():
     def init_memory(self,config):
         self.buffer = ReplayBuffer(config, self.predict_net, self.target_net, self.opt_lossf)
 
-    def action(self, state):
-        sample = random.random()
+    def action(self, state, phase = "train"):
+        if phase =="train":
+            sample = random.random()
 
-        eps_threshold = self.config.Network.EPS_END + (self.config.Network.EPS_START - self.config.Network.EPS_END) * \
-            math.exp(-1. * self.step_num / self.config.Network.EPS_DECAY)
-        self.step_num += 1
-        if sample > eps_threshold:
+            eps_threshold = self.config.Network.EPS_END + (self.config.Network.EPS_START - self.config.Network.EPS_END) * \
+                math.exp(-1. * self.step_num / self.config.Network.EPS_DECAY)
+            self.step_num += 1
+            if sample > eps_threshold:
+                with torch.no_grad():
+                    return self.predict_net(state).max(1)[1].view(1, 1)
+            else:
+                return torch.tensor([[self.config.Env.action_space.sample()]], device=self.device, dtype=torch.long)
+        else:
             with torch.no_grad():
                 return self.predict_net(state).max(1)[1].view(1, 1)
-        else:
-            return torch.tensor([[self.config.Env.action_space.sample()]], device=self.device, dtype=torch.long)
-
-    def action_select(self, state):
-        with torch.no_grad():
-            return self.predict_net(state).max(1)[1].view(1, 1)
 
     def training(self):
         env = self.config.Env.make_env
@@ -77,7 +77,7 @@ class DQN():
             is_done = False
             num_step = 0 
             while num_step <=self.config.Env.te_max_step or is_done !=True :
-                action = self.action_select(state)
+                action = self.action(state)
                 # state, reward, done, {}
                 next_state, reward, done ,_= env.step(action.item()) 
                 next_state = torch.tensor(next_state, dtype=torch.float32, device=self.device).unsqueeze(0)
