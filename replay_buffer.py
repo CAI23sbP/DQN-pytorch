@@ -62,8 +62,8 @@ class ReplayBuffer():
             for i in range(len(rewards)-1):
                 G_return += rewards[i]*self.config.Network.GAMMA 
             G_return+=rewards[-1].item()
-        expected_func = self.next_value * self.config.Network.GAMMA + self.reward_batch
-        loss = self.criterion(predict_q_value.view(-1), expected_func)
+        target_q_value = self.next_value * self.config.Network.GAMMA + self.reward_batch
+        loss = self.criterion(predict_q_value.view(-1), target_q_value) ##Q_target - predict_Q
         tag_scalar_loss= {"Q_value_loss": loss}
         tag_scalar_return= {"return": G_return}
         self.writer.add_scalars("return",tag_scalar_return, self.iter)
