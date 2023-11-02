@@ -18,6 +18,10 @@ open `configs.py`
 ## Training rendering ##
 
 
+https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/03c5198e-2b9e-48ea-b632-6d2d37636eb8
+
+
+
 ## Testing rendering ##
 
 
