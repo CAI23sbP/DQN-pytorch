@@ -55,7 +55,7 @@ class ReplayBuffer():
             self.next_value[~self.done_batch] = self.target_net(next_states).max(1)[0]
          
         expected_func = self.next_value * self.config.Network.GAMMA + self.reward_batch
-        loss = self.criterion(predict_q_value.view(-1), expected_func)
+        loss = self.criterion(expected_func,predict_q_value.view(-1))
         tag_scalar_loss= {"Q_value_loss": loss}
         self.writer.add_scalars("Q_value_loss",tag_scalar_loss, self.iter)
         
@@ -78,5 +78,6 @@ class ReplayBuffer():
     def load(self):
         path = os.path.join(os.getcwd(),f"{self.config.Env.save_file_name}.pt")
         print(f"load path {path}")
-        self.target_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
+        #self.target_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
         self.predict_net.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
+        self.target_net.load_state_dict(self.predict_net.state_dict())
