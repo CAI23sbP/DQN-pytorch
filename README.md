@@ -18,3 +18,5 @@ open `configs.py`
 ## Training rendering ##
 https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/10c03d23-e282-4732-8477-ba430eaa7e07
 
+## Architecture example ##
+![image](https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/9ba14aca-1a03-4a0f-baa7-7605b9f22140)
