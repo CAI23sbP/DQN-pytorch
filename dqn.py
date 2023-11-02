@@ -77,7 +77,7 @@ class DQN():
             is_done = False
             num_step = 0 
             while num_step <=self.config.Env.te_max_step or is_done !=True :
-                action = self.action(state)
+                action = self.action(state,phase="test")
                 # state, reward, done, {}
                 next_state, reward, done ,_= env.step(action.item()) 
                 next_state = torch.tensor(next_state, dtype=torch.float32, device=self.device).unsqueeze(0)
