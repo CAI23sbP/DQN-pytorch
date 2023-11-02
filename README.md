@@ -1,6 +1,12 @@
 # DQN-pytorch
 Deep Q-value Network by pytorch
 
+
+## ADD ##
+[O] DQN   `changing Buffer.types to DQNBuffer`
+[O] DDQN  `changing Buffer.types to DDQNBuffer`
+[] PER
+
 ## install ##
 `git clone https://github.com/CAI23sbP/DQN-pytorch.git`
 
