@@ -19,7 +19,10 @@ open `configs.py`
 
 
 ## Testing rendering ##
-https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/1909e2ce-fd79-479f-8d43-4d9aef1d4bb6
+
+
+https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/b593a98c-69d7-4ab2-a7ed-db503ce67bcf
+
 
 
 
