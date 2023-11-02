@@ -1,7 +1,6 @@
 
 import random,torch, os
 from collections import namedtuple, deque
-from torch.utils.tensorboard import SummaryWriter
 
 class ReplayBuffer():
     def __init__(self, configs, predict_net, target_net, opt_lossf):
@@ -14,8 +13,6 @@ class ReplayBuffer():
         self.predict_net = predict_net
         self.target_net = target_net 
         self.optimizer, self.criterion = opt_lossf
-        self.writer = SummaryWriter(os.getcwd())
-        self.iter = 0
 
     def add(self, *args):
         self.memory.append(self.Transition(*args))
@@ -36,34 +33,33 @@ class ReplayBuffer():
 
     def update(self,*args):
         self.add(*args)
-        self.iter +=1
 
         if len(self.memory) < self.config.Buffer.BATCH_SIZE:
             return
-        dataset = self.sample()
-        for i, data in enumerate([*dataset]):
-            self.state_batch[i] = data[0]
-            self.action_batch [i] = data[1] 
-            self.next_state_batch[i] = data[2]
-            self.reward_batch [i] = data[3]
-            self.done_batch [i] = data[4] 
-
-        predict_q_value = self.predict_net(self.state_batch).gather(1, self.action_batch)
-
-        with torch.no_grad():
-            next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,self.config.Env.observation_space)
-            self.next_value[~self.done_batch] = self.target_net(next_states).max(1)[0]
-         
-        expected_func = self.next_value * self.config.Network.GAMMA + self.reward_batch
-        loss = self.criterion(expected_func,predict_q_value.view(-1))
-        tag_scalar_loss= {"Q_value_loss": loss}
-        self.writer.add_scalars("Q_value_loss",tag_scalar_loss, self.iter)
         
-        self.optimizer.zero_grad()
-        loss.backward()
-        torch.nn.utils.clip_grad_value_(self.predict_net.parameters(), 100)
-        self.optimizer.step()
-        
+        for n in range(self.config.Network.epoch):
+            dataset = self.sample()
+            for i, data in enumerate([*dataset]):
+                self.state_batch[i] = data[0]
+                self.action_batch [i] = data[1] 
+                self.next_state_batch[i] = data[2]
+                self.reward_batch [i] = data[3]
+                self.done_batch [i] = data[4] 
+
+            predict_q_value = self.predict_net(self.state_batch).gather(1, self.action_batch)
+
+            with torch.no_grad():
+                next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,self.config.Env.observation_space)
+                self.next_value[~self.done_batch] = self.target_net(next_states).max(1)[0]
+            
+            expected_func = self.next_value * self.config.Network.GAMMA + self.reward_batch
+            loss = self.criterion(expected_func,predict_q_value.view(-1))
+            
+            self.optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_value_(self.predict_net.parameters(), 100)
+            self.optimizer.step()
+    
         target_net_state_dict = self.target_net.state_dict()
         policy_net_state_dict = self.predict_net.state_dict()
         for key in policy_net_state_dict:
