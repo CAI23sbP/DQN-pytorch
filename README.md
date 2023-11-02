@@ -16,7 +16,6 @@ Deep Q-value Network by pytorch
 open `configs.py`
 
 ## Training rendering ##
-https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/10c03d23-e282-4732-8477-ba430eaa7e07
 
 
 ## Testing rendering ##
