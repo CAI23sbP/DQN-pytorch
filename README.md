@@ -24,4 +24,4 @@ https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/1909e2ce-fd79-479f-8d43
 
 
 ## Architecture example ##
-![image](https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/9ba14aca-1a03-4a0f-baa7-7605b9f22140)
+![image](https://github.com/CAI23sbP/DQN-pytorch/assets/108871750/2d17b036-11b8-4329-8725-32ccb5f04a0e)
