@@ -61,6 +61,7 @@ class ReplayBuffer():
         
         self.optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_value_(self.predict_net.parameters(), 100)
         self.optimizer.step()
         
         target_net_state_dict = self.target_net.state_dict()
