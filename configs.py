@@ -3,7 +3,7 @@ import gym
 import torch.optim as optim
 from gym.wrappers.normalize import *
 import numpy as np
-
+from replay_buffer import *
 class BaseConfig():
     def __init__(self):
         pass
@@ -36,7 +36,7 @@ class Config():
     Buffer = BaseConfig()
     Buffer.capacity = 10000
     Buffer.BATCH_SIZE = 128
-
+    Buffer.types = DQNBuffer # 
     Buffer.tuple = {"Transition":("state","action","next_state","reward","done")}
 
     Network = BaseConfig()
