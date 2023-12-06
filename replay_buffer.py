@@ -6,7 +6,7 @@ class DQNBuffer():
     def __init__(self, configs, predict_net, target_net, opt_lossf):
         self.config = configs
         self.memory = deque([], maxlen= self.config.Buffer.capacity)
-        tuples = {"Transition":("state","action","next_state","reward","hidden_state","cell_state","done")}
+        tuples = {"Transition":("state","action","next_state","reward","done")}
         key = list(tuples.keys())[0]
         self.Transition = namedtuple(key,
                         tuples[f"{key}"])
@@ -30,11 +30,10 @@ class DQNBuffer():
         self.next_state_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,self.config.Env.observation_space)
         self.reward_batch = torch.zeros(self.config.Buffer.BATCH_SIZE)
         self.done_batch = torch.zeros(self.config.Buffer.BATCH_SIZE,dtype = torch.bool)
-        self.next_value = torch.zeros(self.config.Buffer.BATCH_SIZE, device=self.config.Env.device)
         
     def update(self,*args):
         self.add(*args)
-
+        #state, action, next_state, reward, done
         if len(self.memory) < self.config.Buffer.BATCH_SIZE:
             return
         
@@ -48,12 +47,12 @@ class DQNBuffer():
                 self.done_batch [i] = data[4] 
 
             predict_q_value = self.predict_net(self.state_batch).gather(1, self.action_batch)
-
+            next_state_values = torch.zeros(self.config.Buffer.BATCH_SIZE, device=self.config.Env.device)
             with torch.no_grad():
                 next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,self.config.Env.observation_space)
-                self.next_value[~self.done_batch] = self.target_net(next_states).max(1)[0]
+                next_state_values[~self.done_batch] = self.target_net(next_states).max(1)[0]
             
-            expected_func = self.next_value * self.config.Network.GAMMA + self.reward_batch
+            expected_func = (next_state_values * self.config.Network.GAMMA) + self.reward_batch
             loss = self.criterion(expected_func,predict_q_value.view(-1))
             
             self.optimizer.zero_grad()
@@ -110,13 +109,14 @@ class DDQNBuffer(DQNBuffer):
                 self.done_batch [i] = data[4] 
 
             predict_q_value = self.predict_net(self.state_batch).gather(1, self.action_batch)
-
+            next_state_values = torch.zeros(self.config.Buffer.BATCH_SIZE, device=self.config.Env.device)
             with torch.no_grad():
                 next_states = torch.cat([next_state for done, next_state in zip(self.done_batch, self.next_state_batch) if not done]).reshape(-1,self.config.Env.observation_space)
                 arg_max_a = self.predict_net(next_states).max(1)[1]
-                self.next_value[~self.done_batch] = self.target_net(next_states).max(1)[0]
+                next_state_values[~self.done_batch] = self.target_net(next_states).max(1)[0]
             
-            expected_func = (self.next_value * arg_max_a).sum(1) * self.config.Network.GAMMA + self.reward_batch
+
+            expected_func = (next_state_values * arg_max_a).sum(1) * self.config.Network.GAMMA + self.reward_batch
             loss = self.criterion(expected_func,predict_q_value.view(-1))
             
             self.optimizer.zero_grad()
